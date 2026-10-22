@@ -1,4 +1,4 @@
-# AgentDesk: AI support triage with human approval
+# AgentDesk: AI support triage
 
 An AI agent reads incoming support tickets, **looks up real customer and order data with tools**,
 checks company policy, and drafts a resolution. A human reviews it in a dashboard. Nothing with a
