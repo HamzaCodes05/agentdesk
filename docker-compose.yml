@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: agentdesk
+      POSTGRES_PASSWORD: agentdesk
+      POSTGRES_DB: agentdesk
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentdesk"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./api
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://agentdesk:agentdesk@db:5432/agentdesk
+      REDIS_HOST: redis
+      AI_SERVICE_URL: http://agent-service:8000
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    ports: ["4000:4000"]
+
+  agent-service:
+    build: ./agent-service
+    env_file: .env
+    environment:
+      API_BASE_URL: http://api:4000
+    depends_on: [api]
+    ports: ["8000:8000"]
+
+  web:
+    build:
+      context: ./web
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4000
+    depends_on: [api]
+    ports: ["3000:3000"]
+
+volumes:
+  pgdata:

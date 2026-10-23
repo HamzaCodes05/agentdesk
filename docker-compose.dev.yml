@@ -1,0 +1,12 @@
+# Just the backing services, for local development of the API.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: agentdesk
+      POSTGRES_PASSWORD: agentdesk
+      POSTGRES_DB: agentdesk
+    ports: ["5432:5432"]
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
